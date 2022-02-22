@@ -20,4 +20,4 @@ jobs:
         run: yarn build
 
       - name: yarn deploy to gh-pages
-        run: gh-pages -d -u ${{ github.actor }} build
+        run: yarn deploy -u ${{ github.actor }}
