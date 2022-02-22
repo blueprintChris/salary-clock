@@ -13,15 +13,16 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      # - name: yarn install dependencies
-      #   run: yarn install
-      # - name: yarn build
-      #   run: yarn build
+      - name: yarn install dependencies
+        run: yarn install
+
+      - name: yarn build
+        run: yarn build
+
       - name: echo
         run: echo $GITHUB_CONTEXT
+
+      - name: yarn deploy to gh-pages
+        run: yarn deploy -u $GITHUB_CONTEXT.pusher.name $GITHUB_CONTEXT.pusher.email
         env:
           GITHUB_CONTEXT: ${{ toJSON(github) }}
-        # env:
-        #   GH_EVENT: ${{ github.event }}
-      # - name: yarn deploy to gh-pages
-      #   run: yarn deploy -u ${{ github.event.pusher.email }}
