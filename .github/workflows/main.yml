@@ -20,4 +20,4 @@ jobs:
         run: yarn build
 
       - name: yarn deploy to gh-pages
-        run: yarn deploy -u ${{ github.actor }}
+        run: yarn deploy -u ${{ GIT_AUTHOR NAME }} ${{ GIT_AUTHOR_EMAIL }}
