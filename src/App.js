@@ -1,24 +1,32 @@
 import { useEffect, useState } from 'react';
+import { StyledAccumulation, StyledAccumulationValue, StyledContentWrapper, StyledInputWrapper } from './styles';
 import './App.css';
+import Button from './components/Button/Button';
+import Input from './components/Input/Input';
+import Error from './components/Error/Error';
 
 function App() {
-  const [tempSalary, setTempSalary] = useState(0);
   const [salary, setSalary] = useState(0);
+  const [payday, setPayday] = useState(0);
 
   const [salaryPerSecond, setSalaryPerSecond] = useState(0);
   const [accumulatedSalary, setAccumulatedSalary] = useState(0);
-  const [payday, setPayday] = useState(0);
+
   const [payDate, setPayDate] = useState(null);
 
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const countSalary = setInterval(() => {
+    const countSalary = () => {
       const newAccumulatedSalary = accumulatedSalary + salaryPerSecond;
       setAccumulatedSalary(newAccumulatedSalary);
+    };
+
+    const countSalaryInterval = setInterval(() => {
+      countSalary();
     }, 1000);
 
-    return () => clearInterval(countSalary);
+    return () => clearInterval(countSalaryInterval);
   }, [accumulatedSalary, salaryPerSecond]);
 
   const calculateSalaryPerSecond = salary => {
@@ -48,6 +56,8 @@ function App() {
       return new Date();
     }
 
+    console.log(payday);
+
     if (today.getDate() < payday) {
       payDate.setDate(0);
     }
@@ -59,58 +69,57 @@ function App() {
   };
 
   const handleSetSalary = () => {
-    if (parseInt(tempSalary)) {
-      setAccumulatedSalary(0);
-      setSalary(+tempSalary);
-      setError('');
-
-      const lastPayday = getLastPayday(payday);
-      const secondsSinceDate = calculateSecondsSinceDate(lastPayday);
-      const salaryPerSec = calculateSalaryPerSecond(+tempSalary);
-      const accumulatedToDate = salaryPerSec * secondsSinceDate;
-
-      setAccumulatedSalary(accumulatedToDate);
-      setSalaryPerSecond(salaryPerSec);
-      setPayDate(lastPayday);
-    } else {
+    if (isNaN(salary) || !salary) {
       setError('Salary must be a number');
+      return;
     }
+
+    if (isNaN(payday) || !payday) {
+      setError('Payday must be a number');
+      return;
+    }
+
+    if (payday > 31 || payday < 0) {
+      setError('Payday must be a number between 0 - 31');
+      return;
+    }
+
+    setError('');
+    setAccumulatedSalary(0);
+
+    const lastPayday = getLastPayday(+payday);
+    const secondsSinceDate = calculateSecondsSinceDate(lastPayday);
+    const salaryPerSec = calculateSalaryPerSecond(+salary);
+    const accumulatedToDate = salaryPerSec * secondsSinceDate;
+
+    setAccumulatedSalary(accumulatedToDate);
+    setSalaryPerSecond(salaryPerSec);
+    setPayDate(lastPayday);
   };
 
   return (
     <div className='App'>
-      <div>
-        <label htmlFor='input-salary'>Annual salary</label>
-        <input type='text' name='input-salary' onChange={e => setTempSalary(e.target.value)} placeholder='i.e. 25000' />
-      </div>
-      <div>
-        <label htmlFor='input-payday'>Monthly payday</label>
-        <input type='text' name='input-payday' onChange={e => setPayday(e.target.value)} placeholder='day of month, i.e. 28' />
-      </div>
-      <div></div>
-      <button onClick={handleSetSalary}>Calculate</button>
-      <div>
-        {salary ? (
-          <span>
-            You earn <strong>£{salary}</strong> a year.
-          </span>
-        ) : null}
-      </div>
-      <div>{payDate && `Your payday is on the ${payday} of each month`}</div>
+      <h1>./Salary Clock</h1>
+      <StyledInputWrapper className='input-wrapper'>
+        <Input name='input-salary' type='text' label='Enter your annual salary' handleChange={e => setSalary(e.target.value)} placeholder='eg. 25000' />
+        <Input name='input-payday' type='text' label='Enter your monthly payday' handleChange={e => setPayday(e.target.value)} placeholder='eg. 28 (or 0)' />
+        <Button handleClick={handleSetSalary} label='Calculate' />
+      </StyledInputWrapper>
       {accumulatedSalary ? (
-        <>
-          <div>
-            You earn (roughly) <strong>£{salaryPerSecond.toFixed(4)}</strong> a second, over a 24-hour period.
+        <StyledContentWrapper className='content-wrapper'>
+          <StyledAccumulation className='accumulation-wrapper'>
+            <span>You have accumulated</span>
+            <StyledAccumulationValue className='accummulation-value'>£{accumulatedSalary && accumulatedSalary.toFixed(4)}</StyledAccumulationValue>
+            <span>
+              since <strong>{payDate && `${payDate.toLocaleDateString()}`}</strong>
+            </span>
+          </StyledAccumulation>
+          <div className='earnings-wrapper'>
+            You earn (roughly) <strong>£{salaryPerSecond.toFixed(4)}</strong> every single second of every single day.
           </div>
-          <div>
-            You have accumulated <strong>£{accumulatedSalary && accumulatedSalary.toFixed(4)}</strong> since{' '}
-            <strong>{payDate && `${payDate.toLocaleDateString()}`}</strong>
-          </div>
-        </>
-      ) : (
-        <span>Hit calculate to see your earnings $$$$</span>
-      )}
-      <div>{error && error}</div>
+        </StyledContentWrapper>
+      ) : null}
+      {error && <Error>{error}</Error>}
     </div>
   );
 }
