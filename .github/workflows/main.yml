@@ -17,4 +17,4 @@ jobs:
         run: yarn install
 
       - name: yarn build & deploy to gh-pages
-        run: yarn deploy
+        run: yarn deploy -u ${{ github.actor }}
