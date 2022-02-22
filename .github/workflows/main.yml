@@ -20,7 +20,6 @@ jobs:
       #   run: yarn build
 
       - name: echo
-        run: echo ${{ github.event }}
-
+        run: echo "$github.event"
       # - name: yarn deploy to gh-pages
       #   run: yarn deploy -u ${{ github.event.pusher.email }}
