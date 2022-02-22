@@ -16,5 +16,8 @@ jobs:
       - name: yarn install dependencies
         run: yarn install
 
-      - name: yarn build & deploy to gh-pages
-        run: yarn deploy -u ${{ github.actor }}
+      - name: yarn build
+        run: yarn build
+
+      - name: yarn deploy to gh-pages
+        run: gh-pages -d -u ${{ github.actor }} build
