@@ -18,7 +18,7 @@ jobs:
       # - name: yarn build
       #   run: yarn build
       - name: echo
-        run: echo ${{ GITHUB_ACTION }}
+        run: echo ${{ env.GITHUB_ACTION }}
         # env:
         #   GH_EVENT: ${{ github.event }}
       # - name: yarn deploy to gh-pages
