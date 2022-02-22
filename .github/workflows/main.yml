@@ -19,10 +19,7 @@ jobs:
       - name: yarn build
         run: yarn build
 
-      - name: echo
-        run: echo $GITHUB_CONTEXT
-
       - name: yarn deploy to gh-pages
         run: yarn deploy -u $GITHUB_CONTEXT.pusher.name $GITHUB_CONTEXT.pusher.email
         env:
-          GITHUB_CONTEXT: ${{ toJSON(github) }}
+          GITHUB_CONTEXT: ${{ github }}
